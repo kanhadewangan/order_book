@@ -1,42 +1,34 @@
-use actix_web::{web, App, HttpServer, Responder};
+use actix_web::{web, App, HttpServer};
+use dotenvy::dotenv;
+use std::env;
 
-
-async fn hello() -> impl Responder {
-    "Hello, World!"
-}
-#[warn(dead_code)]
-struct Users{
-    id :i32,
-    name :String,
-    email :String,
-    password :String,
-}
-
-#[derive(serde::Deserialize)]
-struct SignupData {
-    id :i32,
-    name:String,
-    email:String,
-    password:String,
-    created_at:String,
-    updated_at:String,
-}
-async fn signup(info: SignupData) -> impl Responder {
-    // Here you would typically save the user data to a database
-    format!("User {} signed up with email {}", info.name, info.email)
-  
-}
-
-
-
+mod db;
+mod handler;
+mod models;
+mod schema;
+mod user_handler;
+mod auth;
+mod fixtures;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| {
+    dotenv().ok();
+
+    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    let pool = db::init_pool(&database_url);
+    println!("Server running at http://127.0.0.1:8080");
+
+    HttpServer::new(move || {
         App::new()
-            .route("/", web::get().to(hello))
+            .app_data(web::Data::new(pool.clone()))
+            .route("/orders", web::get().to(handler::get_orders))
+            .route("/orders", web::post().to(handler::create_order))
+            .route("/register", web::post().to(user_handler::register_user))
+            .route("/login", web::post().to(user_handler::login_user))
     })
+
     .bind("127.0.0.1:8080")?
     .run()
     .await
+    
 }

@@ -1,0 +1,2 @@
+fn(actix_web::web::Data<Pool<ConnectionManager<PgConnection>>>, actix_web::web::Json<LoginRequest>) -> impl Responder {login_user}
+fn(actix_web::web::Data<Pool<ConnectionManager<PgConnection>>>, actix_web::web::Json<LoginRequest>) -> impl Responder {login_user}: Handler<_>
