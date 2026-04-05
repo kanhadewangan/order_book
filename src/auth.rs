@@ -2,7 +2,7 @@ use chrono::{Utc, Duration};
 use jsonwebtoken::{encode, decode, Header, Validation, EncodingKey, DecodingKey};
 use crate::models::{Claims, User};
 
-
+#[warn(nonstandard_style)]
 const secret_key:[u8; 32] =  [0; 32]; // In production, use a secure key from env variable or config
 
 
